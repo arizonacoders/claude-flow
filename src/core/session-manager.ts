@@ -106,58 +106,57 @@ export class SessionManager {
     this.store = store;
   }
 
-  generateSessionId(issueNumber: number, persona: PersonaType, projectPath: string): string {
-    const name = `${projectPath}:${persona}:${issueNumber}`;
+  generateSessionId(issueNumber: number, persona: PersonaType, projectPath: string, fresh: boolean = false): string {
+    // Include timestamp for fresh sessions to avoid conflicts with old Claude sessions
+    const timestamp = fresh ? `:${Date.now()}` : '';
+    const name = `${projectPath}:${persona}:${issueNumber}${timestamp}`;
     return uuidv5(name, NAMESPACE);
   }
 
   async startOrResume(config: SessionConfig): Promise<SessionHandle> {
-    const sessionId = this.generateSessionId(
+    // Look up existing session by issue+persona
+    const existing = this.store.getSessionByIssue(
       config.issueNumber,
       config.persona,
       config.projectPath
     );
 
-    const existing = this.store.getSession(sessionId);
-
     if (existing && !config.fork) {
       if (existing.status === 'active') {
-        throw new SessionAlreadyRunningError(config.issueNumber, sessionId);
+        throw new SessionAlreadyRunningError(config.issueNumber, existing.id);
       }
 
-      // If session failed/aborted before ever running successfully, start fresh
-      // (resumeCount 0 means it never completed a successful run)
-      const neverRanSuccessfully =
-        (existing.status === 'failed' || existing.status === 'aborted') &&
-        existing.resumeCount === 0;
-
-      if (neverRanSuccessfully) {
-        logger.debug('Previous session never ran successfully, starting fresh');
-        // Delete the old session and start new
-        this.store.updateSession(sessionId, { status: 'aborted' });
-        return this.start(sessionId, config, true); // true = replace existing
+      // If session is waiting or completed previous runs, resume it
+      if (existing.status === 'waiting' || existing.resumeCount > 0) {
+        return this.resume(existing, config);
       }
 
-      return this.resume(existing, config);
+      // Session failed before ever running successfully - start fresh with new ID
+      logger.debug('Previous session never ran successfully, starting fresh');
+      this.store.updateSession(existing.id, { status: 'aborted' });
     }
+
+    // Generate fresh session ID (with timestamp to avoid Claude conflicts)
+    const sessionId = this.generateSessionId(
+      config.issueNumber,
+      config.persona,
+      config.projectPath,
+      true // fresh = include timestamp
+    );
 
     return this.start(sessionId, config);
   }
 
-  private start(sessionId: string, config: SessionConfig, replace: boolean = false): SessionHandle {
+  private start(sessionId: string, config: SessionConfig): SessionHandle {
     logger.session('Starting session', sessionId, `#${config.issueNumber} ${config.persona}`);
 
-    // Create or replace session in database
-    if (replace) {
-      this.store.updateSession(sessionId, { status: 'active', resumeCount: 0 });
-    } else {
-      this.store.createSession({
-        id: sessionId,
-        issueNumber: config.issueNumber,
-        persona: config.persona,
-        projectPath: config.projectPath,
-      });
-    }
+    // Create session in database
+    this.store.createSession({
+      id: sessionId,
+      issueNumber: config.issueNumber,
+      persona: config.persona,
+      projectPath: config.projectPath,
+    });
 
     this.store.recordEvent(sessionId, 'started', {
       issueNumber: config.issueNumber,
