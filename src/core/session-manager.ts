@@ -124,22 +124,40 @@ export class SessionManager {
       if (existing.status === 'active') {
         throw new SessionAlreadyRunningError(config.issueNumber, sessionId);
       }
+
+      // If session failed/aborted before ever running successfully, start fresh
+      // (resumeCount 0 means it never completed a successful run)
+      const neverRanSuccessfully =
+        (existing.status === 'failed' || existing.status === 'aborted') &&
+        existing.resumeCount === 0;
+
+      if (neverRanSuccessfully) {
+        logger.debug('Previous session never ran successfully, starting fresh');
+        // Delete the old session and start new
+        this.store.updateSession(sessionId, { status: 'aborted' });
+        return this.start(sessionId, config, true); // true = replace existing
+      }
+
       return this.resume(existing, config);
     }
 
     return this.start(sessionId, config);
   }
 
-  private start(sessionId: string, config: SessionConfig): SessionHandle {
+  private start(sessionId: string, config: SessionConfig, replace: boolean = false): SessionHandle {
     logger.session('Starting session', sessionId, `#${config.issueNumber} ${config.persona}`);
 
-    // Create session in database
-    this.store.createSession({
-      id: sessionId,
-      issueNumber: config.issueNumber,
-      persona: config.persona,
-      projectPath: config.projectPath,
-    });
+    // Create or replace session in database
+    if (replace) {
+      this.store.updateSession(sessionId, { status: 'active', resumeCount: 0 });
+    } else {
+      this.store.createSession({
+        id: sessionId,
+        issueNumber: config.issueNumber,
+        persona: config.persona,
+        projectPath: config.projectPath,
+      });
+    }
 
     this.store.recordEvent(sessionId, 'started', {
       issueNumber: config.issueNumber,
@@ -199,6 +217,7 @@ export class SessionManager {
       sessionId,
       '-p',
       `/${config.persona} ${config.issueNumber}`,
+      '--verbose',
       '--output-format',
       'stream-json',
       '--model',
@@ -214,6 +233,7 @@ export class SessionManager {
       session.id,
       '-p',
       prompt,
+      '--verbose',
       '--output-format',
       'stream-json',
       '--model',
