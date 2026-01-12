@@ -150,15 +150,15 @@ export class SessionManager {
     const args = this.buildStartCommand(sessionId, config);
 
     // Spawn Claude process
-    const process = spawn('claude', args, {
+    const childProcess = spawn('claude', args, {
       cwd: config.projectPath,
       stdio: config.verbose ? ['inherit', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env },
+      env: { ...globalThis.process.env },
     });
 
-    logger.debug('Spawned Claude process', { pid: process.pid, args });
+    logger.debug('Spawned Claude process', { pid: childProcess.pid, args });
 
-    return new SessionHandle(sessionId, process, this.store);
+    return new SessionHandle(sessionId, childProcess, this.store);
   }
 
   private resume(session: Session, config: SessionConfig): SessionHandle {
@@ -182,15 +182,15 @@ export class SessionManager {
     const args = this.buildResumeCommand(session, config);
 
     // Spawn Claude process
-    const process = spawn('claude', args, {
+    const childProcess = spawn('claude', args, {
       cwd: config.projectPath,
       stdio: config.verbose ? ['inherit', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env },
+      env: { ...globalThis.process.env },
     });
 
-    logger.debug('Spawned Claude resume process', { pid: process.pid, args });
+    logger.debug('Spawned Claude resume process', { pid: childProcess.pid, args });
 
-    return new SessionHandle(session.id, process, this.store);
+    return new SessionHandle(session.id, childProcess, this.store);
   }
 
   private buildStartCommand(sessionId: string, config: SessionConfig): string[] {
