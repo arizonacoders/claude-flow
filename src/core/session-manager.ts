@@ -212,17 +212,31 @@ export class SessionManager {
   }
 
   private buildStartCommand(sessionId: string, config: SessionConfig): string[] {
+    // Map persona type to slash command name
+    const slashCommand = this.getSlashCommand(config.persona);
+
     return [
       '--session-id',
       sessionId,
       '-p',
-      `/${config.persona} ${config.issueNumber}`,
+      `/${slashCommand} ${config.issueNumber}`,
       '--verbose',
       '--output-format',
       'stream-json',
       '--model',
       config.config.claude.model,
     ];
+  }
+
+  private getSlashCommand(persona: PersonaType): string {
+    // Persona commands are prefixed with "persona:"
+    const commandMap: Record<PersonaType, string> = {
+      'review-draft': 'persona:review-draft',
+      architect: 'persona:architect',
+      'qa-review': 'persona:qa-review',
+      triage: 'persona:triage',
+    };
+    return commandMap[persona];
   }
 
   private buildResumeCommand(session: Session, config: SessionConfig): string[] {
