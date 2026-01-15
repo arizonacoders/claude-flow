@@ -1,126 +1,86 @@
 import chalk from 'chalk';
-import { StateStore } from '../core/state-store.js';
-import { setJsonMode } from '../utils/logger.js';
-import type { Session, SessionStatus } from '../types/index.js';
+import { Store } from '../core/store.js';
+import { getDbPath } from '../utils/config.js';
+import { getCurrentProject } from '../utils/project-context.js';
+import type { IssueStatus, StatusOptions } from '../types/index.js';
 
-interface StatusOptions {
-  json?: boolean;
-}
-
-export async function showStatus(issueNumber: number | undefined, options: StatusOptions): Promise<void> {
-  if (options.json) {
-    setJsonMode(true);
-  }
-
-  const store = new StateStore();
+export async function showStatus(options: StatusOptions): Promise<void> {
+  const store = new Store(getDbPath());
 
   try {
-    if (issueNumber) {
-      await showIssueStatus(store, issueNumber, options);
+    // Determine project filter
+    let projectId: string | undefined;
+    let projectName: string | undefined;
+
+    if (options.all) {
+      // --all flag: show stats across all projects
+      projectId = undefined;
     } else {
-      await showAllStatus(store, options);
+      // Default: use current project context
+      const currentProject = getCurrentProject();
+      if (currentProject) {
+        projectId = currentProject.id;
+        projectName = currentProject.name;
+      }
+      // If no project context, show all stats (backwards compatible)
+    }
+
+    const stats = store.getStats(projectId);
+
+    if (options.json) {
+      console.log(JSON.stringify({ ...stats, projectId, projectName }, null, 2));
+      return;
+    }
+
+    console.log(chalk.bold('\n📊 Claude-Flow Status\n'));
+
+    // Show project context
+    if (!options.all && !projectId) {
+      console.log(chalk.dim('Showing all issues. Run "claude-flow project init" to scope to this repository.'));
+    } else if (projectName) {
+      console.log(`Project: ${chalk.cyan(projectName)}`);
+    }
+
+    // Total
+    console.log(`Total issues: ${chalk.cyan(stats.total)}`);
+    console.log('');
+
+    // By status
+    console.log(chalk.bold('By Status:'));
+
+    const statusOrder: IssueStatus[] = ['draft', 'arch-review', 'test-design', 'ready', 'archived'];
+    const statusColors: Record<IssueStatus, (s: string) => string> = {
+      draft: chalk.yellow,
+      'arch-review': chalk.blue,
+      'test-design': chalk.cyan,
+      ready: chalk.green,
+      archived: chalk.gray,
+    };
+
+    const maxCount = Math.max(...Object.values(stats.byStatus), 1);
+    const barWidth = 30;
+
+    for (const status of statusOrder) {
+      const count = stats.byStatus[status];
+      const bar = '█'.repeat(Math.round((count / maxCount) * barWidth));
+      const color = statusColors[status];
+
+      console.log(`  ${padRight(status, 12)} ${color(bar)} ${count}`);
+    }
+
+    // Quick commands hint
+    console.log(chalk.dim('\nCommands:'));
+    console.log(chalk.dim('  claude-flow issue list          List all issues'));
+    console.log(chalk.dim('  claude-flow issue create <t>    Create a new issue'));
+    console.log(chalk.dim('  claude-flow serve               Start web UI'));
+    if (!projectName) {
+      console.log(chalk.dim('  claude-flow project init        Initialize project'));
     }
   } finally {
     store.close();
   }
 }
 
-async function showIssueStatus(
-  store: StateStore,
-  issueNumber: number,
-  options: StatusOptions
-): Promise<void> {
-  const sessions = store.getSessionsForIssue(issueNumber);
-
-  if (sessions.length === 0) {
-    if (options.json) {
-      console.log(JSON.stringify({ sessions: [] }));
-    } else {
-      console.log(`No sessions found for issue #${issueNumber}`);
-    }
-    return;
-  }
-
-  if (options.json) {
-    console.log(JSON.stringify({ sessions }));
-    return;
-  }
-
-  console.log(`\n${chalk.bold(`Sessions for issue #${issueNumber}`)}\n`);
-  printSessionsTable(sessions);
-}
-
-async function showAllStatus(store: StateStore, options: StatusOptions): Promise<void> {
-  const sessions = store.getAllActiveSessions();
-
-  if (options.json) {
-    console.log(JSON.stringify({ sessions }));
-    return;
-  }
-
-  if (sessions.length === 0) {
-    console.log('No active sessions');
-    return;
-  }
-
-  console.log(`\n${chalk.bold('Active Sessions')}\n`);
-  printSessionsTable(sessions);
-}
-
-function printSessionsTable(sessions: Session[]): void {
-  // Header
-  console.log(
-    chalk.dim(
-      `${'ID'.padEnd(10)} ${'Issue'.padEnd(8)} ${'Persona'.padEnd(15)} ${'Status'.padEnd(12)} ${'Resumes'.padEnd(8)} Updated`
-    )
-  );
-  console.log(chalk.dim('─'.repeat(80)));
-
-  // Rows
-  for (const session of sessions) {
-    const shortId = session.id.slice(0, 8);
-    const statusColor = getStatusColor(session.status);
-    const updated = formatRelativeTime(session.updatedAt);
-
-    console.log(
-      `${shortId.padEnd(10)} ` +
-        `${`#${session.issueNumber}`.padEnd(8)} ` +
-        `${session.persona.padEnd(15)} ` +
-        `${statusColor(session.status.padEnd(12))} ` +
-        `${String(session.resumeCount).padEnd(8)} ` +
-        `${chalk.dim(updated)}`
-    );
-  }
-
-  console.log();
-}
-
-function getStatusColor(status: SessionStatus): (text: string) => string {
-  switch (status) {
-    case 'active':
-      return chalk.green;
-    case 'waiting':
-      return chalk.yellow;
-    case 'completed':
-      return chalk.blue;
-    case 'failed':
-      return chalk.red;
-    case 'aborted':
-      return chalk.gray;
-    default:
-      return chalk.white;
-  }
-}
-
-function formatRelativeTime(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  return `${diffDays}d ago`;
+function padRight(str: string, len: number): string {
+  return str + ' '.repeat(Math.max(0, len - str.length));
 }

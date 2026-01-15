@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(node dist/index.js:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm create:*)",
+      "Bash(timeout 5 node:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(pkill:*)",
+      "Bash(pgrep:*)"
+    ]
+  },
+  "enabledPlugins": {
+    "oh-my-claude-sisyphus@oh-my-claude-sisyphus": true
+  }
+}

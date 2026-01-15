@@ -1,0 +1,848 @@
+/* App Layout - Light Theme */
+.app {
+  min-height: 100vh;
+  background-color: #fafafa;
+  color: #333;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.app-subtitle {
+  font-size: 0.875rem;
+  color: #888;
+}
+
+.app-main {
+  padding: 1.5rem;
+}
+
+/* Loading & Error States */
+.loading,
+.error {
+  padding: 2rem;
+  text-align: center;
+  color: #888;
+}
+
+.error {
+  color: #ef4444;
+}
+
+.error button {
+  margin-top: 1rem;
+}
+
+/* Issue List Header */
+.issue-list-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.create-issue-btn {
+  padding: 0.5rem 1rem;
+  background-color: #333;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.create-issue-btn:hover {
+  background-color: #555;
+}
+
+/* Kanban Board */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  min-height: calc(100vh - 180px);
+}
+
+.kanban-column {
+  background-color: #fff;
+  border-radius: 16px;
+  border: 2px solid #333;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-header {
+  text-align: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.kanban-title {
+  font-weight: 400;
+  font-size: 1rem;
+  color: #333;
+}
+
+.kanban-count {
+  display: none;
+}
+
+.kanban-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.kanban-empty {
+  color: #ccc;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+/* Issue Card - Base */
+.issue-card {
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  border: none;
+  user-select: none;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+}
+
+.issue-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.issue-card:active {
+  cursor: grabbing;
+}
+
+/* Drag and Drop */
+.kanban-column.drag-over {
+  background-color: #f0f9ff;
+  border-color: #3b82f6;
+  border-style: dashed;
+}
+
+/* Card Colors by Type */
+.issue-card.is-epic {
+  background-color: #f8b4b4;
+}
+
+.issue-card.is-subtask {
+  background-color: #a7f3d0;
+}
+
+.issue-card.is-task {
+  background-color: #bfdbfe;
+}
+
+.issue-card-parent {
+  display: none;
+}
+
+.issue-card-title {
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+}
+
+.issue-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.issue-subtask-count {
+  color: #666;
+  font-size: 0.75rem;
+}
+
+.issue-id {
+  color: #666;
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.issue-priority {
+  font-size: 0.75rem;
+  letter-spacing: -1px;
+}
+
+.issue-card-desc {
+  display: none;
+}
+
+/* Issue Detail */
+.issue-detail {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.issue-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+}
+
+.back-button:hover {
+  color: #333;
+}
+
+/* Archive Button */
+.archive-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #6b7280;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+
+.archive-button:hover:not(:disabled) {
+  background-color: #4b5563;
+}
+
+.archive-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.archive-button.unarchive {
+  background-color: #10b981;
+}
+
+.archive-button.unarchive:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.archive-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 1000;
+  animation: toast-slide-in 0.3s ease;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast-success {
+  background-color: #10b981;
+  color: #fff;
+}
+
+.toast-error {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.issue-detail-content h1 {
+  margin: 0 0 1rem;
+  font-size: 1.75rem;
+  color: #333;
+}
+
+.issue-meta-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.issue-status-badge {
+  background-color: #e5e5e5;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.issue-priority-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.issue-id-badge {
+  font-family: monospace;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.issue-description {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.issue-description h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.issue-description p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+/* Issue Sections */
+.issue-section {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.issue-section h3 {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.issue-parent,
+.issue-children {
+  margin-bottom: 0.75rem;
+}
+
+.issue-parent .label,
+.issue-children .label {
+  color: #666;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+.issue-children ul {
+  margin: 0.5rem 0 0 1rem;
+  padding: 0;
+  list-style: disc;
+}
+
+.issue-children li {
+  margin-bottom: 0.25rem;
+}
+
+.issue-link-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.issue-link-btn:hover {
+  color: #2563eb;
+}
+
+/* Links List */
+.issue-links-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.issue-links-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.link-type {
+  color: #888;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Docs List */
+.issue-docs-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.issue-docs-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.doc-icon {
+  font-size: 1rem;
+}
+
+.doc-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.doc-path {
+  color: #888;
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+.doc-missing {
+  color: #ef4444;
+  font-size: 0.75rem;
+}
+
+/* Comments */
+.comment-thread h3 {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.comments-list {
+  margin-bottom: 1rem;
+}
+
+.comment {
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Threaded comment replies */
+.comment-reply {
+  position: relative;
+  background-color: #f0f0f0;
+}
+
+.comment-thread-line {
+  position: absolute;
+  left: -10px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #d0d0d0;
+}
+
+.comment-replies {
+  margin-top: 0.5rem;
+}
+
+.reply-btn {
+  padding: 0.25rem 0.5rem;
+  background-color: transparent;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #666;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.reply-btn:hover {
+  background-color: #e5e5e5;
+  border-color: #ccc;
+}
+
+.comment-orphaned {
+  font-size: 0.75rem;
+  color: #999;
+  font-style: italic;
+}
+
+.comment-id {
+  font-size: 0.65rem;
+  color: #aaa;
+  font-family: monospace;
+}
+
+/* Replying to indicator */
+.replying-to {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background-color: #e8f0fe;
+  border-radius: 4px;
+  color: #3b82f6;
+  font-size: 0.875rem;
+}
+
+.cancel-reply-btn {
+  padding: 0.25rem 0.5rem;
+  background-color: transparent;
+  border: none;
+  color: #666;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.cancel-reply-btn:hover {
+  color: #333;
+}
+
+.comment-persona {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.comment-date {
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.comment-content {
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+.no-comments {
+  color: #999;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Comment Form */
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.comment-form select {
+  width: fit-content;
+  padding: 0.5rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 0.875rem;
+}
+
+.comment-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 0.875rem;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.comment-form textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.comment-form button {
+  width: fit-content;
+  padding: 0.5rem 1rem;
+  background-color: #333;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.comment-form button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.comment-form button:disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/* General Button Styles */
+button {
+  font-family: inherit;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .kanban-board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+
+  .issue-card {
+    min-height: 80px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+/* Create Issue Modal */
+.create-issue-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.create-issue-modal {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 500px;
+  border: 2px solid #333;
+}
+
+.create-issue-modal h2 {
+  margin: 0 0 1.5rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 0.875rem;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.form-actions button[type="button"] {
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.form-actions button[type="button"]:hover {
+  background-color: #e5e5e5;
+}
+
+.form-actions button.primary {
+  background-color: #333;
+  border: none;
+  color: #fff;
+}
+
+.form-actions button.primary:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.form-actions button:disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/* Specification View */
+.specification-view {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.specification-view h3 {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.spec-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spec-field {
+  border-left: 3px solid #3b82f6;
+  padding-left: 1rem;
+}
+
+.spec-field-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.spec-field-content {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.spec-field-content pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: none;
+  padding: 0;
+  overflow: visible;
+}
