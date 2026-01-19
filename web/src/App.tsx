@@ -69,7 +69,6 @@ function App() {
           <h1 className="app-title" onClick={handleTitleClick} style={{ cursor: 'pointer' }}>
             claude-flow
           </h1>
-          <span className="app-subtitle">Pre-issue Refinement System</span>
         </div>
         <div className="app-header-right">
           <ProjectSelector

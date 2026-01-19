@@ -7,23 +7,34 @@
 
 .app-header {
   display: flex;
-  align-items: baseline;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem 2rem;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
 }
 
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .app-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #333;
 }
 
 .app-subtitle {
-  font-size: 0.875rem;
-  color: #888;
+  display: none;
 }
 
 .app-main {
