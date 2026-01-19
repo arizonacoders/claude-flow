@@ -5,20 +5,22 @@ import type { IssueStatus } from '../types/index.js';
 
 // Define valid status transitions
 const validTransitions: Record<IssueStatus, IssueStatus[]> = {
-  'draft': ['arch-review', 'archived'],
-  'arch-review': ['draft', 'test-design', 'archived'],
-  'test-design': ['arch-review', 'ready', 'archived'],
-  'ready': ['test-design', 'archived'],
+  'draft': ['refining', 'archived'],
+  'refining': ['draft', 'feedback', 'ready', 'archived'],
+  'feedback': ['refining', 'archived'],
+  'ready': ['refining', 'exported', 'archived'],
+  'exported': ['archived'],
   'archived': ['draft'],
 };
 
-const statusOrder: IssueStatus[] = ['draft', 'arch-review', 'test-design', 'ready'];
+const statusOrder: IssueStatus[] = ['draft', 'refining', 'feedback', 'ready', 'exported'];
 
 const statusLabels: Record<IssueStatus, string> = {
   'draft': 'Draft',
-  'arch-review': 'Architectural Review',
-  'test-design': 'Test Case Design',
+  'refining': 'Refining',
+  'feedback': 'Needs Feedback',
   'ready': 'Ready',
+  'exported': 'Exported',
   'archived': 'Archived',
 };
 
@@ -141,9 +143,10 @@ export async function workflowStatus(options: { json?: boolean }): Promise<void>
 
     const byStatus: Record<IssueStatus, typeof issues> = {
       'draft': [],
-      'arch-review': [],
-      'test-design': [],
+      'refining': [],
+      'feedback': [],
       'ready': [],
+      'exported': [],
       'archived': [],
     };
 

@@ -1,7 +1,23 @@
 // Issue types
-export type IssueStatus = 'draft' | 'arch-review' | 'test-design' | 'ready' | 'archived';
+export type IssueStatus =
+  | 'draft'      // Just created, waiting for watcher
+  | 'refining'   // Three Amigos workshop in progress
+  | 'feedback'   // Needs user input (questions pending)
+  | 'ready'      // All specs complete, ready for export
+  | 'exported'   // Pushed to GitHub
+  | 'archived';  // Closed without export
+
 export type Priority = 'low' | 'medium' | 'high' | 'critical';
-export type PersonaType = 'review-draft' | 'architect' | 'qa-review' | 'triage' | 'user';
+
+export type PersonaType =
+  | 'orchestrator'  // Refinement coordinator
+  | 'review-draft'  // Alex - requirements clarity
+  | 'architect'     // Sam - technical feasibility
+  | 'qa-review'     // Blake - black box QA
+  | 'triage'        // Nik - PM (legacy)
+  | 'system'        // Automated actions
+  | 'user';         // Human input
+
 export type LinkType = 'blocks' | 'depends_on' | 'duplicates' | 'related_to';
 
 // Project types
@@ -33,10 +49,12 @@ export interface ProjectStats {
 
 // Persona display names - friendly names for the Three Amigos team
 export const personaDisplayNames: Record<PersonaType, string> = {
-  'triage': 'Nik (Product Manager)',
+  'orchestrator': 'Orchestrator',
   'review-draft': 'Alex (Technical Product Owner)',
   'architect': 'Sam (Dev Team Leader)',
   'qa-review': 'Blake (QA)',
+  'triage': 'Nik (Product Manager)',
+  'system': 'System',
   'user': 'User',
 };
 

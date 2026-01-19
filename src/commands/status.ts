@@ -48,12 +48,13 @@ export async function showStatus(options: StatusOptions): Promise<void> {
     // By status
     console.log(chalk.bold('By Status:'));
 
-    const statusOrder: IssueStatus[] = ['draft', 'arch-review', 'test-design', 'ready', 'archived'];
+    const statusOrder: IssueStatus[] = ['draft', 'refining', 'feedback', 'ready', 'exported', 'archived'];
     const statusColors: Record<IssueStatus, (s: string) => string> = {
       draft: chalk.yellow,
-      'arch-review': chalk.blue,
-      'test-design': chalk.cyan,
+      refining: chalk.blue,
+      feedback: chalk.magenta,
       ready: chalk.green,
+      exported: chalk.cyan,
       archived: chalk.gray,
     };
 

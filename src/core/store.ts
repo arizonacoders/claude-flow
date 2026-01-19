@@ -522,9 +522,10 @@ export class Store {
 
     const byStatus: Record<IssueStatus, number> = {
       draft: 0,
-      'arch-review': 0,
-      'test-design': 0,
+      refining: 0,
+      feedback: 0,
       ready: 0,
+      exported: 0,
       archived: 0,
     };
 

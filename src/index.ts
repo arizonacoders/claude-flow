@@ -10,6 +10,7 @@ import { serve } from './commands/serve.js';
 import { exportIssue } from './commands/export.js';
 import { workflowNext, workflowSet, workflowStatus } from './commands/workflow.js';
 import { initProject, listProjects, showProject } from './commands/project.js';
+import { startWatch } from './commands/watch.js';
 import type { IssueStatus, Priority, LinkType } from './types/index.js';
 
 const program = new Command();
@@ -64,7 +65,7 @@ issueCmd
   .description('Update an issue')
   .option('-t, --title <title>', 'New title')
   .option('-d, --description <text>', 'New description')
-  .option('-s, --status <status>', 'New status: draft|arch-review|test-design|ready|archived')
+  .option('-s, --status <status>', 'New status: draft|refining|feedback|ready|exported|archived')
   .option('-p, --priority <priority>', 'New priority: low|medium|high|critical')
   .option('--parent <id>', 'Set parent issue (use "none" to clear)')
   .action(async (id: string, options) => {
@@ -107,7 +108,7 @@ program
 program
   .command('comment <issue-id>')
   .description('Add a comment to an issue')
-  .requiredOption('-p, --persona <persona>', 'Who is commenting: review-draft|architect|qa-review|triage|user')
+  .requiredOption('-p, --persona <persona>', 'Who is commenting: orchestrator|review-draft|architect|qa-review|triage|system|user')
   .option('-m, --message <text>', 'Comment content (or read from stdin)')
   .option('--reply-to <comment-id>', 'Reply to a specific comment (UUID or first 8 chars)')
   .option('--metadata <json>', 'JSON metadata')
@@ -227,6 +228,23 @@ workflowCmd
   .option('--json', 'Output as JSON')
   .action(async (options) => {
     await workflowStatus({ json: options.json });
+  });
+
+// ============ Watch Command ============
+program
+  .command('watch')
+  .description('Watch for issue status changes and spawn Claude processes')
+  .option('-i, --interval <seconds>', 'Poll interval in seconds', '30')
+  .option('-m, --max-concurrent <number>', 'Maximum concurrent Claude processes', '3')
+  .option('--status', 'Show watcher status')
+  .option('--daemon', 'Run as background daemon')
+  .action(async (options) => {
+    await startWatch({
+      interval: parseInt(options.interval),
+      maxConcurrent: parseInt(options.maxConcurrent),
+      status: options.status,
+      daemon: options.daemon,
+    });
   });
 
 program.parse();
