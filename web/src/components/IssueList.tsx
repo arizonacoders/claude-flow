@@ -3,22 +3,13 @@ import { useIssues } from '../hooks/useIssues';
 import { IssueCard } from './IssueCard';
 import { CreateIssueForm } from './CreateIssueForm';
 import { updateIssue } from '../api/client';
+import { STATUS_COLORS, STATUS_LABELS, ACTIVE_STATUSES } from '../constants/colors';
 import type { Issue, IssueStatus } from '../types';
 
 interface IssueListProps {
   onSelectIssue: (issue: Issue) => void;
   projectId?: string | null;
 }
-
-const statuses: IssueStatus[] = ['draft', 'arch-review', 'test-design', 'ready', 'archived'];
-
-const statusLabels: Record<IssueStatus, string> = {
-  'draft': 'Draft',
-  'arch-review': 'Architectural Review',
-  'test-design': 'Test Case Design',
-  'ready': 'Ready',
-  'archived': 'Archived',
-};
 
 export function IssueList({ onSelectIssue, projectId }: IssueListProps) {
   const { issues, loading, error, refetch } = useIssues(undefined, projectId);
@@ -92,8 +83,8 @@ export function IssueList({ onSelectIssue, projectId }: IssueListProps) {
   }
 
   // Group issues by status
-  const issuesByStatus = statuses.reduce((acc, status) => {
-    acc[status] = issues.filter(issue => issue.status === status);
+  const issuesByStatus = ACTIVE_STATUSES.reduce((acc, status) => {
+    acc[status] = issues.filter(issue => issue.status === status && !issue.parentId);
     return acc;
   }, {} as Record<IssueStatus, Issue[]>);
 
@@ -106,16 +97,17 @@ export function IssueList({ onSelectIssue, projectId }: IssueListProps) {
       </div>
 
       <div className="kanban-board" onDragEnd={handleDragEnd}>
-        {statuses.filter(s => s !== 'archived').map(status => (
+        {ACTIVE_STATUSES.map(status => (
           <div
             key={status}
             className={`kanban-column ${dragOverColumn === status ? 'drag-over' : ''}`}
+            style={{ borderLeftColor: STATUS_COLORS[status] }}
             onDragOver={(e) => handleDragOver(e, status)}
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, status)}
           >
             <div className="kanban-header">
-              <span className="kanban-title">{statusLabels[status]}</span>
+              <span className="kanban-title">{STATUS_LABELS[status]}</span>
               <span className="kanban-count">{issuesByStatus[status].length}</span>
             </div>
             <div className="kanban-cards">
