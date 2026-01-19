@@ -1,10 +1,28 @@
+import { useState } from 'react';
+import { STATUS_COLORS } from '../constants/colors';
 import type { Issue } from '../types';
+
+function getRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
 
 interface IssueCardProps {
   issue: Issue;
   allIssues: Issue[];
   onClick: () => void;
   onDragStart?: (e: React.DragEvent, issue: Issue) => void;
+  onSelectIssue?: (issue: Issue) => void;
 }
 
 const priorityColors: Record<string, string> = {
@@ -21,7 +39,8 @@ const priorityDots: Record<string, string> = {
   critical: '\u25CF\u25CF\u25CF\u25CF',
 };
 
-export function IssueCard({ issue, allIssues, onClick, onDragStart }: IssueCardProps) {
+export function IssueCard({ issue, allIssues, onClick, onDragStart, onSelectIssue }: IssueCardProps) {
+  const [expanded, setExpanded] = useState(false);
   // Find parent issue if this is a subtask
   const parent = issue.parentId
     ? allIssues.find(i => i.id === issue.parentId)
@@ -44,6 +63,8 @@ export function IssueCard({ issue, allIssues, onClick, onDragStart }: IssueCardP
     }
   };
 
+  const lastActivity = issue.updatedAt;
+
   return (
     <div
       className={`issue-card ${cardType}`}
@@ -51,13 +72,8 @@ export function IssueCard({ issue, allIssues, onClick, onDragStart }: IssueCardP
       draggable
       onDragStart={handleDragStart}
     >
-      {parent && (
-        <div className="issue-card-parent" title={`Subtask of: ${parent.title}`}>
-          ↳ {parent.title.length > 25 ? parent.title.substring(0, 25) + '...' : parent.title}
-        </div>
-      )}
-      <div className="issue-card-title">{issue.title}</div>
-      <div className="issue-card-meta">
+      <div className="issue-card-header">
+        <span className="issue-id">#{issue.number}</span>
         <span
           className="issue-priority"
           style={{ color: priorityColors[issue.priority] }}
@@ -65,18 +81,53 @@ export function IssueCard({ issue, allIssues, onClick, onDragStart }: IssueCardP
         >
           {priorityDots[issue.priority]}
         </span>
-        {children.length > 0 && (
-          <span className="issue-subtask-count" title={`${children.length} subtask(s)`}>
-            {children.length} subtask{children.length > 1 ? 's' : ''}
-          </span>
-        )}
-        <span className="issue-id">#{issue.number}</span>
       </div>
-      {issue.description && (
-        <div className="issue-card-desc">
-          {issue.description.length > 80
-            ? issue.description.substring(0, 80) + '...'
-            : issue.description}
+
+      <div className="issue-card-title">{issue.title}</div>
+
+      <div className="issue-card-time">
+        <span title="Created">📅 {getRelativeTime(issue.createdAt)}</span>
+        <span title="Last activity">💬 {getRelativeTime(lastActivity)}</span>
+      </div>
+
+      {children.length > 0 && (
+        <div className="issue-card-children">
+          <button
+            className="children-toggle"
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }}
+          >
+            {expanded ? '▼' : '▶'} {children.length} subtask{children.length > 1 ? 's' : ''}
+          </button>
+          {expanded && (
+            <ul className="children-list">
+              {children.map(child => (
+                <li
+                  key={child.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectIssue?.(child);
+                  }}
+                >
+                  <span
+                    className="child-status-dot"
+                    style={{ backgroundColor: STATUS_COLORS[child.status] }}
+                    title={child.status}
+                  />
+                  <span className="child-number">#{child.number}</span>
+                  <span className="child-title">{child.title}</span>
+                  <span
+                    className="child-priority"
+                    style={{ color: priorityColors[child.priority] }}
+                  >
+                    {priorityDots[child.priority]}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </div>
