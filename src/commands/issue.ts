@@ -406,9 +406,10 @@ function displayCommentTree(comments: Comment[], depth: number, isLast: boolean[
 function formatStatus(status: IssueStatus): string {
   const colors: Record<IssueStatus, (s: string) => string> = {
     draft: chalk.yellow,
-    'arch-review': chalk.blue,
-    'test-design': chalk.cyan,
+    refining: chalk.blue,
+    feedback: chalk.magenta,
     ready: chalk.green,
+    exported: chalk.cyan,
     archived: chalk.gray,
   };
   return colors[status](status);
