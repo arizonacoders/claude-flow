@@ -6,13 +6,13 @@ import type { StatusTrigger } from './types.js';
  */
 export const STATUS_TRIGGERS: Partial<Record<IssueStatus, StatusTrigger>> = {
   draft: {
-    command: '/refine-issue',
+    command: '/refinement:refine-issue',
     description: 'Starting refinement workshop',
     nextStatus: 'refining',
     allowedTools: 'Read,Glob,Grep,Bash,Task',
   },
   ready: {
-    command: '/export-to-github',
+    command: '/refinement:export-to-github',
     description: 'Exporting to GitHub',
     nextStatus: 'exported',
     allowedTools: 'Read,Glob,Grep,Bash',
