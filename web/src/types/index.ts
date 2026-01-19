@@ -1,7 +1,7 @@
 // Issue types
-export type IssueStatus = 'draft' | 'arch-review' | 'test-design' | 'ready' | 'archived';
+export type IssueStatus = 'draft' | 'refining' | 'feedback' | 'ready' | 'exported' | 'archived';
 export type Priority = 'low' | 'medium' | 'high' | 'critical';
-export type PersonaType = 'review-draft' | 'architect' | 'qa-review' | 'triage' | 'user';
+export type PersonaType = 'orchestrator' | 'review-draft' | 'architect' | 'qa-review' | 'triage' | 'system' | 'user';
 export type LinkType = 'blocks' | 'depends_on' | 'duplicates' | 'related_to';
 
 // Project types
