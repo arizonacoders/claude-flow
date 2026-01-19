@@ -59,7 +59,15 @@ export function CompletedList({ onSelectIssue, projectId }: CompletedListProps) 
             <div
               key={issue.id}
               className="completed-item"
+              tabIndex={0}
+              role="button"
               onClick={() => onSelectIssue(issue)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectIssue(issue);
+                }
+              }}
             >
               <span
                 className="completed-badge"
