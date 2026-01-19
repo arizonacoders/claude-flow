@@ -37,6 +37,7 @@ export interface WatcherOptions {
   maxConcurrent: number; // Max concurrent Claude processes
   stateFile: string;     // Path to state file
   daemon: boolean;       // Run as daemon
+  dryRun: boolean;       // Log actions but don't spawn processes
 }
 
 /**

@@ -7,6 +7,7 @@ export interface WatchOptions {
   maxConcurrent?: number;
   status?: boolean;
   daemon?: boolean;
+  dryRun?: boolean;
 }
 
 let activeWatcher: Watcher | null = null;
@@ -36,6 +37,7 @@ export async function startWatch(options: WatchOptions): Promise<void> {
     interval: options.interval,
     maxConcurrent: options.maxConcurrent,
     daemon: options.daemon,
+    dryRun: options.dryRun,
   });
 
   // Handle graceful shutdown
@@ -57,6 +59,10 @@ export async function startWatch(options: WatchOptions): Promise<void> {
     console.log(`Project: ${chalk.cyan(currentProject.name)}`);
     console.log(`Path: ${chalk.dim(currentProject.gitPath || 'N/A')}`);
     console.log('');
+  }
+
+  if (options.dryRun) {
+    console.log(chalk.yellow('DRY RUN MODE - will not spawn Claude processes\n'));
   }
 
   console.log(chalk.dim('Watching for status changes...'));

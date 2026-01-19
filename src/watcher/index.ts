@@ -153,6 +153,21 @@ export class Watcher {
       chalk.dim(trigger.description)
     );
 
+    // In dry-run mode, just log what would happen
+    if (this.options.dryRun) {
+      console.log(
+        chalk.yellow('  [DRY RUN]'),
+        chalk.dim(`Would spawn: claude --print "${trigger.command} ${issue.number}"`)
+      );
+      console.log(
+        chalk.yellow('  [DRY RUN]'),
+        chalk.dim(`Would set status: ${issue.status} → ${trigger.nextStatus}`)
+      );
+      // Update state without PID to track that we've seen this issue
+      this.state.setIssueState(issue.id, issue.status);
+      return;
+    }
+
     // Spawn Claude process
     const result = spawnClaude(
       issue.number,
@@ -235,6 +250,7 @@ export function createWatcher(
     stateFile:
       process.env.HOME + '/.claude-flow/watcher-state.json',
     daemon: false,
+    dryRun: false,
   };
 
   return new Watcher({ ...defaults, ...overrides });

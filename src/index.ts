@@ -238,12 +238,14 @@ program
   .option('-m, --max-concurrent <number>', 'Maximum concurrent Claude processes', '3')
   .option('--status', 'Show watcher status')
   .option('--daemon', 'Run as background daemon')
+  .option('--dry-run', 'Log actions without spawning processes')
   .action(async (options) => {
     await startWatch({
       interval: parseInt(options.interval),
       maxConcurrent: parseInt(options.maxConcurrent),
       status: options.status,
       daemon: options.daemon,
+      dryRun: options.dryRun,
     });
   });
 
