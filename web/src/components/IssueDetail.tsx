@@ -14,9 +14,10 @@ interface IssueDetailProps {
 
 const statusLabels: Record<IssueStatus, string> = {
   'draft': 'Draft',
-  'arch-review': 'Architectural Review',
-  'test-design': 'Test Case Design',
+  'refining': 'Refining',
+  'feedback': 'Feedback',
   'ready': 'Ready',
+  'exported': 'Exported',
   'archived': 'Archived',
 };
 

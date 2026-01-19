@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { IssueList } from './components/IssueList';
 import { IssueDetail } from './components/IssueDetail';
 import { ProjectSelector } from './components/ProjectSelector';
+import { TabNavigation } from './components/TabNavigation';
+import { CompletedList } from './components/CompletedList';
+import { ProjectStats } from './components/ProjectStats';
 import type { Issue } from './types';
 import './App.css';
 
@@ -19,6 +22,7 @@ function getSavedProjectId(): string | null {
 function App() {
   const [selectedIssueId, setSelectedIssueId] = useState<string | null>(getIssueIdFromUrl);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(getSavedProjectId);
+  const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'stats'>('active');
 
   // Handle browser back/forward buttons
   useEffect(() => {
@@ -83,7 +87,18 @@ function App() {
             onSelectIssue={handleSelectIssue}
           />
         ) : (
-          <IssueList onSelectIssue={handleSelectIssue} projectId={selectedProjectId} />
+          <>
+            <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+            {activeTab === 'active' && (
+              <IssueList onSelectIssue={handleSelectIssue} projectId={selectedProjectId} />
+            )}
+            {activeTab === 'completed' && (
+              <CompletedList onSelectIssue={handleSelectIssue} projectId={selectedProjectId} />
+            )}
+            {activeTab === 'stats' && (
+              <ProjectStats projectId={selectedProjectId} />
+            )}
+          </>
         )}
       </main>
     </div>

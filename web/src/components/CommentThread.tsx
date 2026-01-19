@@ -9,18 +9,22 @@ interface CommentThreadProps {
 }
 
 const personaIcons: Record<PersonaType, string> = {
+  'orchestrator': '🎭',
   'review-draft': '\uD83D\uDCDD',
   'architect': '\uD83C\uDFDB\uFE0F',
   'qa-review': '\uD83E\uDDEA',
   'triage': '\uD83D\uDCCB',
+  'system': '⚙️',
   'user': '\uD83D\uDC64',
 };
 
 const personaLabels: Record<PersonaType, string> = {
+  'orchestrator': 'Orchestrator',
   'review-draft': 'Alex (TPO)',
   'architect': 'Sam (Dev Lead)',
   'qa-review': 'Blake (QA)',
   'triage': 'Nik (PM)',
+  'system': 'System',
   'user': 'User',
 };
 
