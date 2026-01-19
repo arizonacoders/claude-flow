@@ -1,14 +1,18 @@
 import { useState } from 'react';
-import { STATUS_COLORS } from '../constants/colors';
+import { STATUS_COLORS, PRIORITY_COLORS } from '../constants/colors';
 import type { Issue } from '../types';
+
+const MS_PER_MINUTE = 60_000;
+const MS_PER_HOUR = 3_600_000;
+const MS_PER_DAY = 86_400_000;
 
 function getRelativeTime(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+  const diffMins = Math.floor(diffMs / MS_PER_MINUTE);
+  const diffHours = Math.floor(diffMs / MS_PER_HOUR);
+  const diffDays = Math.floor(diffMs / MS_PER_DAY);
 
   if (diffMins < 1) return 'just now';
   if (diffMins < 60) return `${diffMins}m ago`;
@@ -25,13 +29,6 @@ interface IssueCardProps {
   onSelectIssue?: (issue: Issue) => void;
 }
 
-const priorityColors: Record<string, string> = {
-  low: '#6b7280',
-  medium: '#3b82f6',
-  high: '#f59e0b',
-  critical: '#ef4444',
-};
-
 const priorityDots: Record<string, string> = {
   low: '\u25CF\u25CB\u25CB\u25CB',
   medium: '\u25CF\u25CF\u25CB\u25CB',
@@ -41,10 +38,8 @@ const priorityDots: Record<string, string> = {
 
 export function IssueCard({ issue, allIssues, onClick, onDragStart, onSelectIssue }: IssueCardProps) {
   const [expanded, setExpanded] = useState(false);
-  // Find parent issue if this is a subtask
-  const parent = issue.parentId
-    ? allIssues.find(i => i.id === issue.parentId)
-    : null;
+  // Check if this is a subtask
+  const hasParent = Boolean(issue.parentId);
 
   // Find children (subtasks) of this issue
   const children = allIssues.filter(i => i.parentId === issue.id);
@@ -53,7 +48,7 @@ export function IssueCard({ issue, allIssues, onClick, onDragStart, onSelectIssu
   let cardType = 'is-task'; // default: blue
   if (children.length > 0) {
     cardType = 'is-epic'; // has children: pink/red
-  } else if (parent) {
+  } else if (hasParent) {
     cardType = 'is-subtask'; // has parent: green
   }
 
@@ -76,7 +71,7 @@ export function IssueCard({ issue, allIssues, onClick, onDragStart, onSelectIssu
         <span className="issue-id">#{issue.number}</span>
         <span
           className="issue-priority"
-          style={{ color: priorityColors[issue.priority] }}
+          style={{ color: PRIORITY_COLORS[issue.priority] }}
           title={issue.priority}
         >
           {priorityDots[issue.priority]}
@@ -106,9 +101,18 @@ export function IssueCard({ issue, allIssues, onClick, onDragStart, onSelectIssu
               {children.map(child => (
                 <li
                   key={child.id}
+                  tabIndex={0}
+                  role="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     onSelectIssue?.(child);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelectIssue?.(child);
+                    }
                   }}
                 >
                   <span
@@ -120,7 +124,7 @@ export function IssueCard({ issue, allIssues, onClick, onDragStart, onSelectIssu
                   <span className="child-title">{child.title}</span>
                   <span
                     className="child-priority"
-                    style={{ color: priorityColors[child.priority] }}
+                    style={{ color: PRIORITY_COLORS[child.priority] }}
                   >
                     {priorityDots[child.priority]}
                   </span>
